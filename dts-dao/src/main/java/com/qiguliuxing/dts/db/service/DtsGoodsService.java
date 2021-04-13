@@ -3,9 +3,8 @@ package com.qiguliuxing.dts.db.service;
 import com.github.pagehelper.PageHelper;
 import com.qiguliuxing.dts.db.dao.DtsGoodsMapper;
 import com.qiguliuxing.dts.db.domain.DtsGoods;
-import com.qiguliuxing.dts.db.domain.DtsGoodsExample;
 import com.qiguliuxing.dts.db.domain.DtsGoods.Column;
-
+import com.qiguliuxing.dts.db.domain.DtsGoodsExample;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -273,9 +272,7 @@ public class DtsGoodsService {
 	/**
 	 * 根据店铺，获取店铺对应类别的商品
 	 * 
-	 * @param brandId
-	 * @param i
-	 * @param related
+
 	 * @return
 	 */
 	public List<DtsGoods> queryByBrandId(int bid, int cid, int offset, int limit) {
@@ -289,11 +286,7 @@ public class DtsGoodsService {
 
 	/**
 	 * 同类商品，且不同店铺
-	 * 
-	 * @param brandId
-	 * @param cid
-	 * @param i
-	 * @param limitCid
+	 *
 	 * @return
 	 */
 	public List<DtsGoods> queryByCategoryAndNotSameBrandId(int bid, int cid, int offset, int limit) {
@@ -304,5 +297,9 @@ public class DtsGoodsService {
 		PageHelper.startPage(offset, limit);
 
 		return goodsMapper.selectByExampleSelective(example, columns);
+	}
+
+	public List<DtsGoods> queryBySeckill() {
+		return goodsMapper.queryBySeckill();
 	}
 }

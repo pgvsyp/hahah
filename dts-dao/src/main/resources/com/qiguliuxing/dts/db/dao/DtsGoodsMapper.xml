@@ -887,4 +887,12 @@
     update dts_goods set deleted = 1
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="queryBySeckill" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    is_hot = 0
+  </select>
 </mapper>

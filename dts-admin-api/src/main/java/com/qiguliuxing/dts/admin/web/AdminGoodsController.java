@@ -10,6 +10,7 @@ import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.core.validator.Order;
 import com.qiguliuxing.dts.core.validator.Sort;
 import com.qiguliuxing.dts.db.domain.DtsGoods;
+import com.qiguliuxing.dts.db.service.DtsGoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -20,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,9 @@ public class AdminGoodsController {
 
 	@Autowired
 	private AdminGoodsService adminGoodsService;
+
+	@Autowired
+	private DtsGoodsService dtsGoodsService;
 	
 	@Autowired
 	private AdminDataAuthService adminDataAuthService;
@@ -48,7 +53,6 @@ public class AdminGoodsController {
 	 * @param order
 	 * @return
 	 */
-	@ApiOperation(value = "商品查询")
 	@RequiresPermissions("admin:goods:list")
 	@RequiresPermissionsDesc(menu = { "商品管理", "商品管理" }, button = "查询")
 	@GetMapping("/list")
@@ -75,6 +79,26 @@ public class AdminGoodsController {
 		}
 		
 		return adminGoodsService.list(goodsSn, name, page, limit, sort, order, brandIds);
+	}
+
+	@ApiOperation(value = "轮播图商品查询")
+	@GetMapping("/lbList")
+	public Object lbList() {
+		List<DtsGoods> list = new ArrayList<>();
+		list.add(dtsGoodsService.findById(23851));
+		list.add(dtsGoodsService.findById(23848));
+		list.add(dtsGoodsService.findById(23835));
+		list.add(dtsGoodsService.findById(23050));
+		list.add(dtsGoodsService.findById(23044));
+		list.add(dtsGoodsService.findById(23040));
+		return list;
+	}
+
+	@ApiOperation(value = "秒杀商品查询")
+	@GetMapping("/seckillList")
+	public Object seckillList() {
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryBySeckill();
+		return dtsGoods;
 	}
 
 	@GetMapping("/catAndBrand")
