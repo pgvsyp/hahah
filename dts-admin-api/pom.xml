@@ -48,6 +48,18 @@
             <artifactId>swagger-annotations</artifactId>
             <version>1.5.24</version>
         </dependency>
+
+        <!-- 邮箱验证 -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

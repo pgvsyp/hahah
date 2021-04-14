@@ -1,16 +1,25 @@
 package com.qiguliuxing.dts.admin.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSONObject;
+import com.qiguliuxing.dts.admin.dao.UserInfo;
+import com.qiguliuxing.dts.admin.dao.UserToken;
+import com.qiguliuxing.dts.admin.service.UserTokenManager;
+import com.qiguliuxing.dts.admin.util.*;
+import com.qiguliuxing.dts.core.captcha.CaptchaCodeManager;
+import com.qiguliuxing.dts.core.consts.CommConsts;
+import com.qiguliuxing.dts.core.type.UserTypeEnum;
+import com.qiguliuxing.dts.core.util.Base64;
+import com.qiguliuxing.dts.core.util.JacksonUtil;
+import com.qiguliuxing.dts.core.util.ResponseUtil;
+import com.qiguliuxing.dts.core.util.UUID;
+import com.qiguliuxing.dts.core.util.bcrypt.BCryptPasswordEncoder;
+import com.qiguliuxing.dts.db.domain.DtsAdmin;
+import com.qiguliuxing.dts.db.domain.DtsUser;
+import com.qiguliuxing.dts.db.service.DtsPermissionService;
+import com.qiguliuxing.dts.db.service.DtsRoleService;
+import com.qiguliuxing.dts.db.service.DtsUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -21,30 +30,23 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.alibaba.fastjson.JSONObject;
-import com.qiguliuxing.dts.admin.util.AdminResponseCode;
-import com.qiguliuxing.dts.admin.util.AdminResponseUtil;
-import com.qiguliuxing.dts.admin.util.Permission;
-import com.qiguliuxing.dts.admin.util.PermissionUtil;
-import com.qiguliuxing.dts.admin.util.VerifyCodeUtils;
-import com.qiguliuxing.dts.core.captcha.CaptchaCodeManager;
-import com.qiguliuxing.dts.core.util.Base64;
-import com.qiguliuxing.dts.core.util.JacksonUtil;
-import com.qiguliuxing.dts.core.util.ResponseUtil;
-import com.qiguliuxing.dts.core.util.UUID;
-import com.qiguliuxing.dts.db.domain.DtsAdmin;
-import com.qiguliuxing.dts.db.service.DtsPermissionService;
-import com.qiguliuxing.dts.db.service.DtsRoleService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.*;
 
+import static com.qiguliuxing.dts.admin.util.WxResponseCode.AUTH_INVALID_ACCOUNT;
+
+@Api(tags = "用户操作")
 @RestController
 @RequestMapping("/admin/auth")
 @Validated
@@ -55,6 +57,9 @@ public class AdminAuthController {
 	private DtsRoleService roleService;
 	@Autowired
 	private DtsPermissionService permissionService;
+
+	@Autowired
+	private DtsUserService userService;
 
 	/*
 	 * { username : value, password : value }
@@ -100,6 +105,146 @@ public class AdminAuthController {
 		logger.info("【请求结束】系统管理->用户登录,响应结果:{}", JSONObject.toJSONString(currentUser.getSession().getId()));
 		return ResponseUtil.ok(currentUser.getSession().getId());
 	}
+
+	@ApiOperation(value = "用户登录")
+	@PostMapping("/userLogin")
+	public Object userLogin(@RequestBody String body, HttpServletRequest request) {
+		logger.info("【请求开始】账户登录,请求参数,body:{}", body);
+
+		String username = JacksonUtil.parseString(body, "username");
+		String password = JacksonUtil.parseString(body, "password");
+
+		if (username == null || password == null) {
+			return ResponseUtil.badArgument();
+		}
+
+		List<DtsUser> userList = userService.queryByMobile(username);
+		DtsUser user = null;
+		if (userList.size() > 1) {
+			logger.error("账户登录 出现多个同名用户错误,用户名:{},用户数量:{}", username, userList.size());
+			return ResponseUtil.serious();
+		} else if (userList.size() == 0) {
+			logger.error("账户登录 用户尚未存在,用户名:{}", username);
+			return ResponseUtil.badArgumentValue();
+		} else {
+			user = userList.get(0);
+		}
+
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		if (!encoder.matches(password, user.getPassword())) {
+			logger.error("账户登录 ,错误密码：{},{}", password, AUTH_INVALID_ACCOUNT.desc());// 错误的密码打印到日志中作为提示也无妨
+			return WxResponseUtil.fail(AUTH_INVALID_ACCOUNT);
+		}
+
+		// userInfo
+		UserInfo userInfo = new UserInfo();
+		userInfo.setNickName(user.getUsername());
+		userInfo.setAvatarUrl(user.getAvatar());
+
+		try {
+			String registerDate = new SimpleDateFormat("yyyy-MM-dd")
+					.format(user.getAddTime() == null ? user.getAddTime() : LocalDateTime.now());
+			userInfo.setRegisterDate(registerDate);
+			userInfo.setStatus(user.getStatus());
+			userInfo.setUserLevel(user.getUserLevel());// 用户层级
+			userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
+		} catch (Exception e) {
+			logger.error("账户登录：设置用户指定信息出错："+e.getMessage());
+			e.printStackTrace();
+		}
+
+		// token
+		UserToken userToken = null;
+		try {
+			userToken = UserTokenManager.generateToken(user.getId());
+		} catch (Exception e) {
+			logger.error("账户登录失败,生成token失败：{}", user.getId());
+			e.printStackTrace();
+			return ResponseUtil.fail();
+		}
+
+		Map<Object, Object> result = new HashMap<Object, Object>();
+		result.put("token", userToken.getToken());
+		result.put("tokenExpire", userToken.getExpireTime().toString());
+		result.put("userInfo", userInfo);
+
+		logger.info("【请求结束】账户登录,响应结果:{}", JSONObject.toJSONString(result));
+		return ResponseUtil.ok(result);
+	}
+
+	@ApiOperation(value = "用户注册")
+	@PostMapping("/userRegister")
+	public Object userRegister(@RequestBody String body, HttpServletRequest request) {
+		logger.info("【请求开始】账号注册,请求参数，body:{}", body);
+
+		String username = JacksonUtil.parseString(body, "username");
+		String password = JacksonUtil.parseString(body, "password");
+		String mobile = JacksonUtil.parseString(body, "mobile");
+//		String wxCode = JacksonUtil.parseString(body, "wxCode");
+
+		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(mobile)) {
+			return ResponseUtil.badArgument();
+		}
+
+		List<DtsUser> userList = userService.queryByUsername(username);
+
+		DtsUser user = null;
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String encodedPassword = encoder.encode(password);
+		user = new DtsUser();
+		user.setUsername(username);
+		user.setPassword(encodedPassword);
+		user.setMobile(mobile);
+//		user.setWeixinOpenid(openId);
+		user.setAvatar(CommConsts.DEFAULT_AVATAR);
+		user.setNickname(username);
+		user.setGender((byte) 0);
+		user.setUserLevel((byte) 0);
+		user.setStatus((byte) 0);
+		user.setLastLoginTime(LocalDateTime.now());
+		user.setLastLoginIp(IpUtil.client(request));
+		userService.add(user);
+
+		// userInfo
+		UserInfo userInfo = new UserInfo();
+		userInfo.setNickName(username);
+		userInfo.setAvatarUrl(user.getAvatar());
+
+		// token
+		UserToken userToken = null;
+		try {
+			userToken = UserTokenManager.generateToken(user.getId());
+		} catch (Exception e) {
+			logger.error("账号注册失败,生成token失败：{}", user.getId());
+			e.printStackTrace();
+			return ResponseUtil.fail();
+		}
+
+		Map<Object, Object> result = new HashMap<Object, Object>();
+		result.put("token", userToken.getToken());
+		result.put("tokenExpire", userToken.getExpireTime().toString());
+		result.put("userInfo", userInfo);
+
+		logger.info("【请求结束】账号注册,响应结果:{}", JSONObject.toJSONString(result));
+		return ResponseUtil.ok(result);
+
+	}
+
+	@ApiOperation(value = "发送邮箱验证码")
+	@PostMapping("/sendEmail")
+	public Map<String, String> sendEmail(@RequestBody Map jsonObject) throws JSONException {
+		String eMail = (String) jsonObject.get("eMail");
+
+		String randomCode = MailUtil.generateRandomCode(5);
+
+		MailUtil.sendMail(eMail, randomCode);
+
+		//返回邮箱验证码
+		Map<String, String> resultMap = new HashMap<>();
+		resultMap.put("eMailCode", randomCode);
+		return resultMap;
+	}
+
 
 	/*
 	 * 用户注销

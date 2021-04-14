@@ -1,23 +1,17 @@
 package com.qiguliuxing.dts.db.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import com.github.pagehelper.PageHelper;
 import com.qiguliuxing.dts.db.bean.DayStatis;
 import com.qiguliuxing.dts.db.dao.DtsUserAccountMapper;
 import com.qiguliuxing.dts.db.dao.DtsUserMapper;
 import com.qiguliuxing.dts.db.dao.ex.StatMapper;
-import com.qiguliuxing.dts.db.domain.DtsUser;
-import com.qiguliuxing.dts.db.domain.DtsUserAccount;
-import com.qiguliuxing.dts.db.domain.DtsUserAccountExample;
-import com.qiguliuxing.dts.db.domain.DtsUserExample;
-import com.qiguliuxing.dts.db.domain.UserVo;
+import com.qiguliuxing.dts.db.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class DtsUserService {
@@ -118,7 +112,7 @@ public class DtsUserService {
 
 	/**
 	 * 审批代理申请
-	 * @param userAccount
+	 * @param
 	 */
 	public void approveAgency(Integer userId,Integer settlementRate,String shareUrl) {
 		//获取账户数据
