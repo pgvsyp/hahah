@@ -12,7 +12,7 @@ import auth from './js/auth';
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = auth;
-axios.defaults.baseURL = "http://localhost:8081/"
+axios.defaults.baseURL = "http://localhost:8083/demo/"
 
 router.beforeEach((to,from,next) =>{
   if(to.meta.title){

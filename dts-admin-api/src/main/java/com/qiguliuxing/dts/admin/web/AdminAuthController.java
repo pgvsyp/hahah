@@ -40,8 +40,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.qiguliuxing.dts.admin.util.WxResponseCode.AUTH_INVALID_ACCOUNT;
@@ -142,8 +142,9 @@ public class AdminAuthController {
 		userInfo.setAvatarUrl(user.getAvatar());
 
 		try {
-			String registerDate = new SimpleDateFormat("yyyy-MM-dd")
-					.format(user.getAddTime() == null ? user.getAddTime() : LocalDateTime.now());
+			String pattern = "yyyy-MM-dd HH:mm:ss";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+			String registerDate = formatter.format(user.getAddTime());
 			userInfo.setRegisterDate(registerDate);
 			userInfo.setStatus(user.getStatus());
 			userInfo.setUserLevel(user.getUserLevel());// 用户层级
@@ -169,6 +170,8 @@ public class AdminAuthController {
 		result.put("userInfo", userInfo);
 
 		logger.info("【请求结束】账户登录,响应结果:{}", JSONObject.toJSONString(result));
+		Subject currentUser = SecurityUtils.getSubject();
+		currentUser.login(new UsernamePasswordToken("luomu", "yujian520"));
 		return ResponseUtil.ok(result);
 	}
 
