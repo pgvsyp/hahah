@@ -1,0 +1,15 @@
+.icon {
+    width: 1em; height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/*屏蔽滚动条*/
+::-webkit-scrollbar {
+    width: 0 !important;
+}
+::-webkit-scrollbar {
+    width: 0 !important;height: 0;
+}
