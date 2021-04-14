@@ -12,7 +12,10 @@
                         class="demo-ruleForm"
                 >
                     <el-form-item prop="username">
-                        <el-input v-model="ruleForm2.username" auto-complete="off" placeholder="请输入手机号/邮箱"></el-input>
+                        <el-input v-model="ruleForm2.username" auto-complete="off" placeholder="请输入用户名"></el-input>
+                    </el-form-item>
+                    <el-form-item prop="mobile">
+                        <el-input v-model="ruleForm2.mobile" auto-complete="off" placeholder="请输入手机号/邮箱"></el-input>
                     </el-form-item>
                     <el-form-item prop="eMailCode" class="code">
                         <el-input v-model="ruleForm2.eMailCode" placeholder="验证码"></el-input>
@@ -40,8 +43,20 @@
 
         name: "Register",
         data() {
-            // <!--验证手机号是否合法-->
+            // <!--验证用户名是否合法-->
             let checkUsername = (rule, value, callback) => {
+                let pattern = /^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]|[a-zA-Z0-9])*$/
+                if (value === '') {
+                    callback(new Error('请输入用户名码'))
+                } else if (!pattern.test(value)) {
+                    callback(new Error('用户名不合法'))
+                } else {
+                    callback()
+                    console.log();
+                }
+            }
+            // <!--验证手机号是否合法-->
+            let checkMobile = (rule, value, callback) => {
                 let pattern = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
                 if (value === '') {
                     callback(new Error('请输入手机号码/邮箱账号'))
@@ -85,6 +100,7 @@
             };
             return {
                 ruleForm2: {
+                    mobile: "",
                     password: "",
                     checkPass: "",
                     username: "",
@@ -95,6 +111,7 @@
                     password: [{validator: validatePass, trigger: 'change'}],
                     checkPass: [{validator: validatePass2, trigger: 'change'}],
                     username: [{validator: checkUsername, trigger: 'change'}],
+                    mobile: [{validator: checkMobile, trigger: 'change'}],
                     eMailCode: [{validator: checkSmscode, trigger: 'change'}],
                 },
                 buttonText: '发送验证码',
@@ -105,7 +122,7 @@
         methods: {
             // <!--发送验证码-->
             sendCode() {
-                let eMail = this.ruleForm2.username;
+                let eMail = this.ruleForm2.mobile;
                 if (this.checkMobileOrEmail(eMail)) {
                     let time = 60
                     this.buttonText = '已发送'
@@ -125,8 +142,8 @@
                     }
                 }
                 //异步请求获取验证码
-                this.axios.post('/user/sendEmail', {
-                    eMail: this.ruleForm2.username
+                this.axios.post('/admin/auth/sendEmail', {
+                    eMail: this.ruleForm2.mobile
                 })
                     .then(response => {
                         this.ruleForm2.eMailVerificationCode = response.data.eMailCode;
@@ -160,9 +177,10 @@
             submitForm(formName) {
                 this.$refs[formName].validate(valid => {
                     if (valid) {
-                        this.axios.post('/user', {
+                        this.axios.post('/admin/auth/userRegister', {
                             username: this.ruleForm2.username,
                             password: this.ruleForm2.password,
+                            mobile: this.ruleForm2.mobile
                         })
                             .then(response => {
                                 this.$router.push('/login')

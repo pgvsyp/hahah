@@ -118,7 +118,7 @@
                     }
                 }
                 //异步请求获取验证码
-                this.axios.post('/user/sendEmail', {
+                this.axios.post('/admin/auth/sendEmail', {
                     eMail: this.ruleForm2.username
                 })
                     .then(response => {
@@ -132,7 +132,7 @@
             submitForm(formName) {
                 this.$refs[formName].validate(valid => {
                     if (valid) {
-                        this.axios.post("/login", {
+                        this.axios.post("/admin/auth/userLogin", {
                             username: this.ruleForm2.username,
                             password: this.ruleForm2.password
                         })
