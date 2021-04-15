@@ -12,7 +12,7 @@ public class CorsConfig {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.addAllowedHeader("*"); // 2 设置访问源请求头
 		corsConfiguration.addAllowedMethod("*"); // 3 设置访问源请求方法
-		corsConfiguration.addAllowedOrigin("http://localhost:8082");
+		corsConfiguration.addAllowedOrigin("*");
 		corsConfiguration.setAllowCredentials(true);
 		return corsConfiguration;
 	}
