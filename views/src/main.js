@@ -13,6 +13,8 @@ Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = auth;
 axios.defaults.baseURL = "http://localhost:8083/demo/"
+axios.defaults.withCredentials=true;
+
 
 router.beforeEach((to,from,next) =>{
   if(to.meta.title){

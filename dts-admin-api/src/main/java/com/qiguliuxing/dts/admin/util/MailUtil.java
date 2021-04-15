@@ -6,13 +6,16 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
+import java.util.Random;
 
 public class MailUtil {
     /**
      * 外网邮件发送
      *
-     * @param to 收件人邮箱地址 收件人@xx.com
+     * @param to   收件人邮箱地址 收件人@xx.com
      * @param code 传入的验证码
      */
     public static void sendMail(String to, String code) {
@@ -73,5 +76,16 @@ public class MailUtil {
             }
         }
         return sb.toString();
+    }
+
+    public static String getOrderIdByTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String newDate = sdf.format(new Date());
+        String result = "";
+        Random random = new Random();
+        for (int i = 0; i < 3; i++) {
+            result += random.nextInt(10);
+        }
+        return newDate + result;
     }
 }

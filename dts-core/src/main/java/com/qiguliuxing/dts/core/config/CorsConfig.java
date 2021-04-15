@@ -10,9 +10,10 @@ import org.springframework.web.filter.CorsFilter;
 public class CorsConfig {
 	private CorsConfiguration buildConfig() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.addAllowedOrigin("*"); // 1 设置访问源地址
 		corsConfiguration.addAllowedHeader("*"); // 2 设置访问源请求头
 		corsConfiguration.addAllowedMethod("*"); // 3 设置访问源请求方法
+		corsConfiguration.addAllowedOrigin("http://localhost:8082");
+		corsConfiguration.setAllowCredentials(true);
 		return corsConfiguration;
 	}
 
