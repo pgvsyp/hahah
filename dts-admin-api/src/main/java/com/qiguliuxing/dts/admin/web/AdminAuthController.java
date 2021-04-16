@@ -145,7 +145,10 @@ public class AdminAuthController {
 			String pattern = "yyyy-MM-dd HH:mm:ss";
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 			String registerDate = formatter.format(user.getAddTime());
+			String updateTime = formatter.format(user.getUpdateTime());
+			userInfo.setUserId(user.getId());
 			userInfo.setRegisterDate(registerDate);
+			userInfo.setUpdateTime(updateTime);
 			userInfo.setStatus(user.getStatus());
 			userInfo.setUserLevel(user.getUserLevel());// 用户层级
 			userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
@@ -153,6 +156,8 @@ public class AdminAuthController {
 			logger.error("账户登录：设置用户指定信息出错："+e.getMessage());
 			e.printStackTrace();
 		}
+
+		userService.updateById(user);
 
 		// token
 		UserToken userToken = null;

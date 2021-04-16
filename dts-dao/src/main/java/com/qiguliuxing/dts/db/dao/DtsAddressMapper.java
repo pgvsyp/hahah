@@ -2,8 +2,9 @@ package com.qiguliuxing.dts.db.dao;
 
 import com.qiguliuxing.dts.db.domain.DtsAddress;
 import com.qiguliuxing.dts.db.domain.DtsAddressExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface DtsAddressMapper {
     /**
@@ -156,4 +157,6 @@ public interface DtsAddressMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int logicalDeleteByPrimaryKey(Integer id);
+
+    List<DtsAddress> queryByUid(Integer uid);
 }

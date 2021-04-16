@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class DtsGoodsService {
@@ -302,4 +303,44 @@ public class DtsGoodsService {
 	public List<DtsGoods> queryBySeckill() {
 		return goodsMapper.queryBySeckill();
 	}
+
+	public DtsGoods queryByRandom() {
+		List<DtsGoods> dtsGoods = goodsMapper.queryByRandom();
+		int i = new Random().nextInt(10);
+		return dtsGoods.get(i);
+	}
+
+	public List<DtsGoods> queryBySpecial() {
+		return goodsMapper.queryBySpecial();
+	}
+
+	public List<DtsGoods> queryByBrand() {
+		return goodsMapper.queryByBrand();
+	}
+
+	public List<DtsGoods> queryByCategory1() {
+		return goodsMapper.queryByCategory1();
+	}
+	public List<DtsGoods> queryByCategory2() {
+		return goodsMapper.queryByCategory2();
+	}
+	public List<DtsGoods> queryByCategory3() {
+		return goodsMapper.queryByCategory3();
+	}
+	public List<DtsGoods> queryByCategory4() {
+		return goodsMapper.queryByCategory4();
+	}
+	public List<DtsGoods> queryByCategory5() {
+		return goodsMapper.queryByCategory5();
+	}
+	public List<DtsGoods> queryByCategory6() {
+		return goodsMapper.queryByCategory6();
+	}
+	public List<DtsGoods> queryByCategory7() {
+		return goodsMapper.queryByCategory7();
+	}
+	public List<DtsGoods> queryByCategory8() {
+		return goodsMapper.queryByCategory8();
+	}
+
 }

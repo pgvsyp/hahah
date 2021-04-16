@@ -895,4 +895,97 @@
     where
     is_hot = 0
   </select>
+  <select id="queryByRandom" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    id
+    between
+    23832
+    and
+    23842
+  </select>
+  <select id="queryBySpecial" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    is_hot = 2
+  </select>
+  <select id="queryByBrand" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    brand_id = 1001016
+  </select>
+
+  <select id="queryByCategory1" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100101003
+  </select>
+  <select id="queryByCategory2" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100100602
+  </select>
+  <select id="queryByCategory3" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100100601
+  </select>
+  <select id="queryByCategory4" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100101102
+  </select>
+  <select id="queryByCategory5" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100100704
+  </select>
+  <select id="queryByCategory6" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100100902
+  </select>
+  <select id="queryByCategory7" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 100100101
+  </select>
+  <select id="queryByCategory8" resultMap="BaseResultMap" >
+    select
+    *
+    from
+    dts_goods
+    where
+    category_id = 1001008
+  </select>
 </mapper>

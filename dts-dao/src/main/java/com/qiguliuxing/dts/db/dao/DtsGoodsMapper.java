@@ -192,4 +192,19 @@ public interface DtsGoodsMapper  {
     int logicalDeleteByPrimaryKey(Integer id);
 
     List<DtsGoods> queryBySeckill();
+
+    List<DtsGoods> queryByRandom();
+
+    List<DtsGoods> queryBySpecial();
+
+    List<DtsGoods> queryByBrand();
+
+    List<DtsGoods> queryByCategory1();
+    List<DtsGoods> queryByCategory2();
+    List<DtsGoods> queryByCategory3();
+    List<DtsGoods> queryByCategory4();
+    List<DtsGoods> queryByCategory5();
+    List<DtsGoods> queryByCategory6();
+    List<DtsGoods> queryByCategory7();
+    List<DtsGoods> queryByCategory8();
 }

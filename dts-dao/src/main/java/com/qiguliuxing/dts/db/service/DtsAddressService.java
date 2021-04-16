@@ -18,9 +18,7 @@ public class DtsAddressService {
 	private DtsAddressMapper addressMapper;
 
 	public List<DtsAddress> queryByUid(Integer uid) {
-		DtsAddressExample example = new DtsAddressExample();
-		example.or().andUserIdEqualTo(uid).andDeletedEqualTo(false);
-		return addressMapper.selectByExample(example);
+		return addressMapper.queryByUid(uid);
 	}
 
 	public DtsAddress findById(Integer id) {

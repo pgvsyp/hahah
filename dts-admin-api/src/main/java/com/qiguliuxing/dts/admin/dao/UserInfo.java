@@ -26,6 +26,15 @@ public class UserInfo implements Serializable {
 	
 	private Byte status;//状态
 	private String registerDate;//注册日期
+	private String updateTime;//上次登录日期
+
+	public String getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
 
 	public String getCountry() {
 		return country;

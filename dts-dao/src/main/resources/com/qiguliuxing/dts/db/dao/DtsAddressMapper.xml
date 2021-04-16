@@ -516,4 +516,12 @@
     update dts_address set deleted = 1
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="queryByUid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    *
+    from
+    dts_address
+    where
+    user_id = #{uid}
+  </select>
 </mapper>

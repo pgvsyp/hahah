@@ -101,6 +101,105 @@ public class AdminGoodsController {
 		return dtsGoods;
 	}
 
+	@ApiOperation(value = "随机商品查询")
+	@GetMapping("/randomList")
+	public Object randomList() {
+		DtsGoods dtsGoods = dtsGoodsService.queryByRandom();
+		return dtsGoods;
+	}
+
+	@ApiOperation(value = "特价商品查询")
+	@GetMapping("/queryBySpecial")
+	public Object queryBySpecial() {
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryBySpecial();
+		return dtsGoods;
+	}
+
+	@ApiOperation(value = "品牌商品查询")
+	@GetMapping("/queryByBrand")
+	public Object queryByBrand() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByBrand();
+		data.put("品牌", "小米童鞋");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+
+	@ApiOperation(value = "频道1(童鞋)商品查询")
+	@GetMapping("/queryByCategory1")
+	public Object queryByCategory1() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory1();
+		data.put("频道", "童鞋");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+
+	@ApiOperation(value = "频道2(女宝专区)商品查询")
+	@GetMapping("/queryByCategory2")
+	public Object queryByCategory2() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory2();
+		data.put("频道", "女宝专区");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+	@ApiOperation(value = "频道3(当季热销)商品查询")
+	@GetMapping("/queryByCategory3")
+	public Object queryByCategory3() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory3();
+		data.put("频道", "当季热销");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+	@ApiOperation(value = "频道4(居家日用)商品查询")
+	@GetMapping("/queryByCategory4")
+	public Object queryByCategory4() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory4();
+		data.put("频道", "居家日用");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+	@ApiOperation(value = "频道5(家用电器)商品查询")
+	@GetMapping("/queryByCategory5")
+	public Object queryByCategory5() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory5();
+		data.put("频道", "家用电器");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+	@ApiOperation(value = "频道6(学习用品)商品查询")
+	@GetMapping("/queryByCategory6")
+	public Object queryByCategory6() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory6();
+		data.put("频道", "学习用品");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+	@ApiOperation(value = "频道7(水果)商品查询")
+	@GetMapping("/queryByCategory7")
+	public Object queryByCategory7() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory7();
+		data.put("频道", "水果");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+	@ApiOperation(value = "频道8(美妆日化)商品查询")
+	@GetMapping("/queryByCategory8")
+	public Object queryByCategory8() {
+		Map<Object, Object> data = new HashMap<>();
+		List<DtsGoods> dtsGoods = dtsGoodsService.queryByCategory8();
+		data.put("频道", "美妆日化");
+		data.put("商品", dtsGoods);
+		return data;
+	}
+
+
 	@GetMapping("/catAndBrand")
 	public Object catAndBrand() {
 		return adminGoodsService.catAndBrand();
