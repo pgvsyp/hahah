@@ -20,6 +20,7 @@ import com.qiguliuxing.dts.db.service.DtsRoleService;
 import com.qiguliuxing.dts.db.service.DtsUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -44,7 +45,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.qiguliuxing.dts.admin.util.WxResponseCode.AUTH_INVALID_ACCOUNT;
+import static com.qiguliuxing.dts.admin.util.WxResponseCode.*;
 
 @Api(tags = "用户操作")
 @RestController
@@ -364,5 +365,80 @@ public class AdminAuthController {
 	@GetMapping("/403")
 	public Object page403() {
 		return ResponseUtil.unauthz();
+	}
+
+	@ApiOperation("密码重置操作")
+	@PostMapping("reset")
+	public Object reset(@RequestBody @ApiParam("需要用户id,密码") DtsUser duser) {
+		Integer uid = duser.getId();
+		String password = duser.getPassword();
+		logger.info("【请求开始】账号密码重置,请求参数，uid, password", uid, password);
+
+		if (password == null) {
+			return ResponseUtil.badArgument();
+		}
+
+		DtsUser user = userService.findById(uid);
+
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String encodedPassword = encoder.encode(password);
+		user.setPassword(encodedPassword);
+
+		if (userService.updateById(user) == 0) {
+			logger.error("账号密码重置更新用户信息出错,id：{}", user.getId());
+			return ResponseUtil.updatedDataFailed();
+		}
+
+		logger.info("【请求结束】账号密码重置成功!");
+		return ResponseUtil.ok();
+	}
+
+	@ApiOperation("退出登录")
+	@PostMapping("logoutUser")
+	public Object logoutUser() {
+		Subject currentUser = SecurityUtils.getSubject();
+		currentUser.logout();
+		logger.info("【请求结束】注销登录成功!");
+		return ResponseUtil.ok();
+	}
+
+	@ApiOperation("注销用户")
+	@PostMapping("deleteUser")
+	public Object deleteUser(@RequestBody @ApiParam("用户id,密码") DtsUser duser) {
+		DtsUser user = userService.findById(duser.getId());
+		String password = duser.getPassword();
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		if (!encoder.matches(password, user.getPassword())) {
+			logger.error("账户登录 ,错误密码：{},{}", password, AUTH_INVALID_ACCOUNT.desc());// 错误的密码打印到日志中作为提示也无妨
+			return WxResponseUtil.fail(AUTH_INVALID_ACCOUNT);
+		}
+		userService.deleteById(duser.getId());
+
+		logger.info("【请求结束】注销成功!");
+		return ResponseUtil.ok();
+	}
+
+	@ApiOperation("头像重置操作")
+	@PostMapping("resetAvatar")
+	public Object resetAvatar(@RequestBody @ApiParam("需要用户id,头像") DtsUser duser) {
+		Integer uid = duser.getId();
+		String avatar = duser.getAvatar();
+		logger.info("【请求开始】账号密码重置,请求参数，uid, password", uid, avatar);
+
+		if (avatar == null) {
+			return ResponseUtil.badArgument();
+		}
+
+		DtsUser user = userService.findById(uid);
+
+		user.setAvatar(avatar);
+
+		if (userService.updateById(user) == 0) {
+			logger.error("头像重置更新用户信息出错,id：{}", user.getId());
+			return ResponseUtil.updatedDataFailed();
+		}
+
+		logger.info("【请求结束】头像重置成功!");
+		return ResponseUtil.ok();
 	}
 }

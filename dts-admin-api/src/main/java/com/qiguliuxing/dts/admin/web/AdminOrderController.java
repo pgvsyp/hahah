@@ -1,26 +1,21 @@
 package com.qiguliuxing.dts.admin.web;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
+import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
+import com.qiguliuxing.dts.admin.service.AdminOrderService;
+import com.qiguliuxing.dts.admin.service.WxOrderService;
+import com.qiguliuxing.dts.admin.util.AuthSupport;
+import com.qiguliuxing.dts.core.validator.Order;
+import com.qiguliuxing.dts.core.validator.Sort;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
-import com.qiguliuxing.dts.admin.service.AdminOrderService;
-import com.qiguliuxing.dts.admin.util.AuthSupport;
-import com.qiguliuxing.dts.core.validator.Order;
-import com.qiguliuxing.dts.core.validator.Sort;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/order")
@@ -30,6 +25,9 @@ public class AdminOrderController {
 
 	@Autowired
 	private AdminOrderService adminOrderService;
+
+	@Autowired
+	private WxOrderService wxOrderService;
 
 	/**
 	 * 查询订单
@@ -118,7 +116,6 @@ public class AdminOrderController {
 	/**
 	 * 回复订单商品
 	 *
-	 * @param body 订单信息，{ orderId：xxx }
 	 * @return 订单操作结果
 	 */
 	@RequiresPermissions("admin:order:listShip")
@@ -129,4 +126,14 @@ public class AdminOrderController {
 
 		return adminOrderService.listShipChannel();
 	}
+
+	@ApiOperation("获取订单列表")
+	@GetMapping("listAll")
+	public Object listAll(@RequestParam Integer userId, @RequestParam(defaultValue = "0") Integer showType,
+					   @RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+		logger.info("【请求开始】订单列表,请求参数,userId:{},showType:{},page:{}", userId, showType, page);
+		return wxOrderService.list(userId, showType, page, size);
+	}
+
+
 }

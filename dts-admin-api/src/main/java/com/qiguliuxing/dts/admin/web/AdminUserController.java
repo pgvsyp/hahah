@@ -1,23 +1,5 @@
 package com.qiguliuxing.dts.admin.web;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
@@ -30,8 +12,23 @@ import com.qiguliuxing.dts.core.validator.Sort;
 import com.qiguliuxing.dts.db.domain.DtsUser;
 import com.qiguliuxing.dts.db.domain.DtsUserAccount;
 import com.qiguliuxing.dts.db.service.DtsAccountService;
+import com.qiguliuxing.dts.db.service.DtsOrderService;
 import com.qiguliuxing.dts.db.service.DtsUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Api(tags = "用户信息接口")
 @RestController
 @RequestMapping("/admin/user")
 @Validated
@@ -46,6 +43,9 @@ public class AdminUserController {
 	
 	@Autowired
 	private DtsAccountService accountService;
+
+	@Autowired
+	private DtsOrderService orderService;
 
 	@RequiresPermissions("admin:user:list")
 	@RequiresPermissionsDesc(menu = { "用户管理", "会员管理" }, button = "查询")
@@ -126,5 +126,24 @@ public class AdminUserController {
 		logger.info("【请求结束】用户管理->会员管理->代理审批:响应结果:{}", "成功!");
 		return ResponseUtil.ok();
 	}
-	
+
+	@ApiOperation("获取用户详情")
+	@GetMapping("/listUser")
+	public Object listUser(@RequestParam Integer userId) {
+		logger.info("【请求开始】用户个人页面数据,请求参数,userId:{}", userId);
+
+		if (userId == null) {
+			logger.error("用户个人页面数据查询失败:用户未登录！！！");
+			return ResponseUtil.unlogin();
+		}
+
+		Map<Object, Object> data = new HashMap<Object, Object>();
+		data.put("order", orderService.orderInfo(userId));
+
+
+		logger.info("【请求结束】用户个人页面数据,响应结果:{}", JSONObject.toJSONString(data));
+		return ResponseUtil.ok(data);
+	}
+
+
 }

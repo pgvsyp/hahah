@@ -232,11 +232,8 @@ public class AdminAddressController {
 	@ApiOperation("删除地址")
 	@PostMapping("delete")
 	public Object delete(@RequestBody DtsAddress address) {
-		Integer userId = address.getUserId();
-		logger.info("【请求开始】删除收货地址,请求参数,userId：{},address:{}", userId, JSONObject.toJSONString(address));
-		if (userId == null) {
-			return ResponseUtil.unlogin();
-		}
+		logger.info("【请求开始】删除收货地址,请求参数,userId：{},address:{}", JSONObject.toJSONString(address));
+
 		Integer id = address.getId();
 		if (id == null) {
 			return ResponseUtil.badArgument();

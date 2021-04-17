@@ -893,7 +893,7 @@
     from
     dts_goods
     where
-    is_hot = 0
+    is_hot = 0 and deleted = 0
   </select>
   <select id="queryByRandom" resultMap="BaseResultMap" >
     select
@@ -906,6 +906,7 @@
     23832
     and
     23842
+    and deleted = 0
   </select>
   <select id="queryBySpecial" resultMap="BaseResultMap" >
     select
@@ -913,7 +914,7 @@
     from
     dts_goods
     where
-    is_hot = 2
+    is_hot = 2 and deleted = 0
   </select>
   <select id="queryByBrand" resultMap="BaseResultMap" >
     select
@@ -921,7 +922,7 @@
     from
     dts_goods
     where
-    brand_id = 1001016
+    brand_id = 1001016 and deleted = 0
   </select>
 
   <select id="queryByCategory1" resultMap="BaseResultMap" >
@@ -930,7 +931,7 @@
     from
     dts_goods
     where
-    category_id = 100101003
+    category_id = 100101003 and deleted = 0
   </select>
   <select id="queryByCategory2" resultMap="BaseResultMap" >
     select
@@ -938,7 +939,7 @@
     from
     dts_goods
     where
-    category_id = 100100602
+    category_id = 100100602 and deleted = 0
   </select>
   <select id="queryByCategory3" resultMap="BaseResultMap" >
     select
@@ -946,7 +947,7 @@
     from
     dts_goods
     where
-    category_id = 100100601
+    category_id = 100100601 and deleted = 0
   </select>
   <select id="queryByCategory4" resultMap="BaseResultMap" >
     select
@@ -954,7 +955,7 @@
     from
     dts_goods
     where
-    category_id = 100101102
+    category_id = 100101102 and deleted = 0
   </select>
   <select id="queryByCategory5" resultMap="BaseResultMap" >
     select
@@ -962,7 +963,7 @@
     from
     dts_goods
     where
-    category_id = 100100704
+    category_id = 100100704 and deleted = 0
   </select>
   <select id="queryByCategory6" resultMap="BaseResultMap" >
     select
@@ -970,7 +971,7 @@
     from
     dts_goods
     where
-    category_id = 100100902
+    category_id = 100100902 and deleted = 0
   </select>
   <select id="queryByCategory7" resultMap="BaseResultMap" >
     select
@@ -978,7 +979,7 @@
     from
     dts_goods
     where
-    category_id = 100100101
+    category_id = 100100101 and deleted = 0
   </select>
   <select id="queryByCategory8" resultMap="BaseResultMap" >
     select
@@ -986,6 +987,6 @@
     from
     dts_goods
     where
-    category_id = 1001008
+    category_id = 1001008 and deleted = 0
   </select>
 </mapper>
