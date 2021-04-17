@@ -1,6 +1,7 @@
 package com.qiguliuxing.dts.admin.web;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
 import com.qiguliuxing.dts.admin.dao.GoodsAllinone;
 import com.qiguliuxing.dts.admin.service.AdminDataAuthService;
@@ -9,10 +10,14 @@ import com.qiguliuxing.dts.admin.util.AuthSupport;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.core.validator.Order;
 import com.qiguliuxing.dts.core.validator.Sort;
+import com.qiguliuxing.dts.db.domain.DtsBrand;
+import com.qiguliuxing.dts.db.domain.DtsComment;
 import com.qiguliuxing.dts.db.domain.DtsGoods;
-import com.qiguliuxing.dts.db.service.DtsGoodsService;
+import com.qiguliuxing.dts.db.domain.DtsUser;
+import com.qiguliuxing.dts.db.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 @Api(tags = "商品操作接口")
 @RestController
@@ -42,6 +47,43 @@ public class AdminGoodsController {
 	@Autowired
 	private AdminDataAuthService adminDataAuthService;
 
+
+	@Autowired
+	private DtsGoodsService goodsService;
+	@Autowired
+	private DtsIssueService goodsIssueService;
+
+	@Autowired
+	private DtsGoodsAttributeService goodsAttributeService;
+	@Autowired
+	private DtsGoodsProductService productService;
+	@Autowired
+	private DtsGoodsSpecificationService goodsSpecificationService;
+	@Autowired
+	private DtsBrandService brandService;
+	@Autowired
+	private DtsCommentService commentService;
+	@Autowired
+	private DtsUserService userService;
+	@Autowired
+	private DtsCollectService collectService;
+
+	@Autowired
+	private DtsFootprintService footprintService;
+
+	@Autowired
+	private DtsCategoryService categoryService;
+
+	@Autowired
+	private DtsSearchHistoryService searchHistoryService;
+	@Autowired
+	private DtsGrouponRulesService rulesService;
+	private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
+
+	private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
+
+	private static ThreadPoolExecutor executorService = new ThreadPoolExecutor(16, 16, 1000, TimeUnit.MILLISECONDS,
+			WORK_QUEUE, HANDLER);
 	/**
 	 * 查询商品
 	 *
@@ -250,19 +292,111 @@ public class AdminGoodsController {
 		return adminGoodsService.create(goodsAllinone);
 	}
 
-	/**
-	 * 商品详情
-	 *
-	 * @param id
-	 * @return
-	 */
-	@RequiresPermissions("admin:goods:read")
-	@RequiresPermissionsDesc(menu = { "商品管理", "商品管理" }, button = "详情")
-	@GetMapping("/detail")
-	public Object detail(@NotNull Integer id) {
-		logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 商品管理->商品管理->详情,请求参数,id:{}", id);
+//	/**
+//	 * 商品详情
+//	 *
+//	 * @param id
+//	 * @return
+//	 */
+//	@RequiresPermissions("admin:goods:read")
+//	@RequiresPermissionsDesc(menu = { "商品管理", "商品管理" }, button = "详情")
+//	@GetMapping("/detail")
+//	public Object detail(@RequestParam Integer id) {
+//		logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 商品管理->商品管理->详情,请求参数,id:{}", id);
+//
+//		return adminGoodsService.detail(id);
+//	}
+	@ApiOperation("商品详情查询")
+	@GetMapping("detail")
+	public Object detail(@RequestParam @ApiParam("商品id") Integer id) {
+		logger.info("【请求开始】商品详情,请求参数,id:{}", id);
 
-		return adminGoodsService.detail(id);
+		// 商品信息
+		DtsGoods info = goodsService.findById(id);
+
+		// 商品属性
+		Callable<List> goodsAttributeListCallable = () -> goodsAttributeService.queryByGid(id);
+
+		// 商品规格 返回的是定制的GoodsSpecificationVo
+		Callable<Object> objectCallable = () -> goodsSpecificationService.getSpecificationVoList(id);
+
+		// 商品规格对应的数量和价格
+		Callable<List> productListCallable = () -> productService.queryByGid(id);
+
+		// 商品问题，这里是一些通用问题
+		Callable<List> issueCallable = () -> goodsIssueService.query();
+
+		// 商品品牌商
+		Callable<DtsBrand> brandCallable = () -> {
+			Integer brandId = info.getBrandId();
+			DtsBrand brand;
+			if (brandId == 0) {
+				brand = new DtsBrand();
+			} else {
+				brand = brandService.findById(info.getBrandId());
+			}
+			return brand;
+		};
+
+		// 评论
+		Callable<Map> commentsCallable = () -> {
+			List<DtsComment> comments = commentService.queryGoodsByGid(id, 0, 2);
+			List<Map<String, Object>> commentsVo = new ArrayList<>(comments.size());
+			long commentCount = PageInfo.of(comments).getTotal();
+			for (DtsComment comment : comments) {
+				Map<String, Object> c = new HashMap<>();
+				c.put("id", comment.getId());
+				c.put("addTime", comment.getAddTime());
+				c.put("content", comment.getContent());
+				DtsUser user = userService.findById(comment.getUserId());
+				c.put("nickname", user.getNickname());
+				c.put("avatar", user.getAvatar());
+				c.put("picList", comment.getPicUrls());
+				commentsVo.add(c);
+			}
+			Map<String, Object> commentList = new HashMap<>();
+			commentList.put("count", commentCount);
+			commentList.put("data", commentsVo);
+			return commentList;
+		};
+
+
+
+		FutureTask<List> goodsAttributeListTask = new FutureTask<>(goodsAttributeListCallable);
+		FutureTask<Object> objectCallableTask = new FutureTask<>(objectCallable);
+		FutureTask<List> productListCallableTask = new FutureTask<>(productListCallable);
+		FutureTask<List> issueCallableTask = new FutureTask<>(issueCallable);
+		FutureTask<Map> commentsCallableTsk = new FutureTask<>(commentsCallable);
+		FutureTask<DtsBrand> brandCallableTask = new FutureTask<>(brandCallable);
+
+		executorService.submit(goodsAttributeListTask);
+		executorService.submit(objectCallableTask);
+		executorService.submit(productListCallableTask);
+		executorService.submit(issueCallableTask);
+		executorService.submit(commentsCallableTsk);
+		executorService.submit(brandCallableTask);
+
+		Map<String, Object> data = new HashMap<>();
+
+		try {
+			data.put("info", info);
+			data.put("issue", issueCallableTask.get());
+			data.put("comment", commentsCallableTsk.get());
+			data.put("specificationList", objectCallableTask.get());
+			data.put("productList", productListCallableTask.get());
+			data.put("attribute", goodsAttributeListTask.get());
+			data.put("brand", brandCallableTask.get());
+		} catch (Exception e) {
+			logger.error("获取商品详情出错:{}", e.getMessage());
+			e.printStackTrace();
+		}
+
+		// 商品分享图片地址
+//		data.put("shareImage", info.getShareUrl());
+
+		logger.info("【请求结束】获取商品详情成功!");// 这里不打印返回的信息，因为此接口查询量大，太耗日志空间
+		return ResponseUtil.ok(data);
 	}
+
 
 }
