@@ -8,16 +8,16 @@ import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.qiguliuxing.dts.admin.config.AlipayConfig;
 import com.qiguliuxing.dts.admin.util.MailUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/admin/pay")
 @Validated
 public class PayController{
@@ -66,15 +66,7 @@ public class PayController{
         httpResponse.getWriter().flush();
         httpResponse.getWriter().close();
         Map<String, Object> data = new HashMap<>();
-        if (response.isSuccess()){
-            System.out.println("调起成功");
-            data.put("msg", "调起成功");
-            return null;
-        }else {
-            System.out.println("调起失败");
-            data.put("msg", "调起失败");
-            return null;
-        }
+        return null;
     }
 
 }

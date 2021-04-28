@@ -26,6 +26,7 @@
                         <el-button type="primary" @click="submitForm('ruleForm2')" style="width:100%;">登录</el-button>
                         <p class="login" @click="gotoLogin">没有账号？立即注册</p>
                     </el-form-item>
+
                 </el-form>
             </div>
         </div>
@@ -194,6 +195,8 @@
                 return result["token"];
                 // return result.token;
             },
+
+
             // _getVal(val){
             //     if(this.Auth.authObj == null){
             //         //console.log("加载sessionStorage中的userAuth信息......");

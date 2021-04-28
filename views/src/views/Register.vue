@@ -33,6 +33,9 @@
                         <el-button type="primary" @click="submitForm('ruleForm2')" style="width:100%;">注册</el-button>
                         <p class="login" @click="gotoLogin">已有账号？立即登录</p>
                     </el-form-item>
+                    <el-form-item>
+                        <p class="login" @click="gotoLogi">没有账号？立即注册</p>
+                    </el-form-item>
                 </el-form>
             </div>
         </div>
@@ -99,6 +102,7 @@
                 }
             };
             return {
+                Auth: this.GLOBAL.Auth,
                 ruleForm2: {
                     mobile: "",
                     password: "",
@@ -204,6 +208,24 @@
                     path: "/login"
                 });
             },
+            gotoLogi() {
+                this.axios.get('/admin/pay/aliPay')
+                    .then(response => {
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            // getUserInfo() {
+            //     let authString = window.sessionStorage.getItem(this.Auth.USER_AUTH_KEY);
+            //     let result = "";
+            //     if (authString) {
+            //         result = JSON.parse(authString);
+            //     }
+            //     console.log(result["userInfo"])
+            //     return result["userInfo"];
+            //     // return result.token;
+            // },
             // 验证手机号
             checkMobileOrEmail(str) {
                 let re = /^1\d{10}$/

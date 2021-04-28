@@ -441,4 +441,27 @@ public class AdminAuthController {
 		logger.info("【请求结束】头像重置成功!");
 		return ResponseUtil.ok();
 	}
+
+	@ApiOperation("修改个人信息操作")
+	@PostMapping("userUpadte")
+	public Object userUpadte(@RequestBody DtsUser duser) {
+		Integer uid = duser.getId();
+		logger.info("【请求开始】账号密码重置,请求参数，uid, password", uid);
+
+		DtsUser user = userService.findById(uid);
+
+		user.setUsername(duser.getUsername());
+		user.setStatus(duser.getStatus());
+		user.setHobby(duser.getHobby());
+		user.setSpecialSource(duser.getSpecialSource());
+		user.setProfiles(duser.getProfiles());
+
+		if (userService.updateById(user) == 0) {
+			logger.error("头像重置更新用户信息出错,id：{}", user.getId());
+			return ResponseUtil.updatedDataFailed();
+		}
+
+		logger.info("【请求结束】头像重置成功!");
+		return ResponseUtil.ok();
+	}
 }

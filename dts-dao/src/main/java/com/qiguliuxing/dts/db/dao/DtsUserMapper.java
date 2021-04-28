@@ -2,8 +2,9 @@ package com.qiguliuxing.dts.db.dao;
 
 import com.qiguliuxing.dts.db.domain.DtsUser;
 import com.qiguliuxing.dts.db.domain.DtsUserExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface DtsUserMapper {
     /**
@@ -156,4 +157,6 @@ public interface DtsUserMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int logicalDeleteByPrimaryKey(Integer id);
+
+    public DtsUser findUserId(Integer id);
 }

@@ -8,7 +8,7 @@
     </div>
 
     <div class="grid grid-flow-col auto-cols-max gap-8 flex justify-center items-center text-sm text-gray-600 mt-2">
-      <div>关于我们</div>
+      <div><a href="/admin/pay/aliPay">关于我们</a></div>
       <div>联系我们</div>
       <div>联系客服</div>
       <div>合作招商</div>

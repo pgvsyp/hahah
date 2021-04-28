@@ -138,7 +138,7 @@ public class AdminUserController {
 		}
 
 		Map<Object, Object> data = new HashMap<Object, Object>();
-		data.put("order", orderService.orderInfo(userId));
+		data.put("userInfo", userService.findUserId(userId));
 
 
 		logger.info("【请求结束】用户个人页面数据,响应结果:{}", JSONObject.toJSONString(data));

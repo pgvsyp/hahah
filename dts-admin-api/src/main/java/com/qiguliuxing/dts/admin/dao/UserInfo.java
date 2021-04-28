@@ -28,6 +28,7 @@ public class UserInfo implements Serializable {
 	private String registerDate;//注册日期
 	private String updateTime;//上次登录日期
 
+
 	public String getUpdateTime() {
 		return updateTime;
 	}

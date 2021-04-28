@@ -163,4 +163,8 @@ public class DtsUserService {
 	public List<DayStatis> recentCount(int statisDaysRang) {
 		return statMapper.statisIncreaseUserCnt(statisDaysRang);
 	}
+
+	public DtsUser findUserId(Integer id) {
+		return userMapper.findUserId(id);
+	}
 }

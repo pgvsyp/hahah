@@ -23,6 +23,9 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="deleted" jdbcType="BIT" property="deleted" />
     <result column="share_user_id" jdbcType="INTEGER" property="shareUserId" />
+    <result column="hobby" jdbcType="VARCHAR" property="hobby" />
+    <result column="special_source" jdbcType="VARCHAR" property="specialSource" />
+    <result column="profiles" jdbcType="VARCHAR" property="profiles" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <!--
@@ -599,4 +602,8 @@
     update dts_user set deleted = 1
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="findUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select * from dts_user where id = #{id}
+  </select>
 </mapper>
